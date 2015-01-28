@@ -13,26 +13,27 @@ end
 class Github
   include HTTParty
   base_uri 'https://api.github.com'
-   
+  
   def initialize(user = "apitestfun", pass = "ironyard1")
     @auth = {:username => user, :password => pass}
   end
 
-  def get_followers(input = "redline6561", options = {})
+  def get_followers(user = "redline6561", options = {}) #{:page => {:page => page}}
   	options.merge!({:basic_auth => @auth})
-  	resp = self.class.get("/users/#{input}/followers", options)
+  	resp = self.class.get("/users/#{user}/followers", options) 
+    #puts "#{resp.headers['x-ratelimit-emaining']} requests left"
   	JSON.parse(resp.body)
   end
 
-  def get_user(input = "matthewsalan", options = {})
+  def get_user(user = "matthewsalan", options = {})
   	options.merge!({:basic_auth => @auth})
-  	resp = self.class.get("/users/#{input}", options)
+  	resp = self.class.get("/users/#{user}", options)
   	JSON.parse(resp.body)
   end
 
-  def get_all_users(input = "redline6561", options = {})
+  def get_all_users(user = "redline6561", options = {})
   	options.merge!({:basic_auth => @auth})
-  	resp = self.class.get("/users/#{input}/followers", options)
+  	resp = self.class.get("/users/#{user}/followers", options)
   	all_users = JSON.parse(resp.body)
 
   	user_info = []
@@ -42,6 +43,36 @@ class Github
   	return user_info
   end
 
+  def get_gists(user = "redline6561")
+    options.merge!({:basic_auth => @auth})
+    resp = self.class.get("/users/#{user}/gists")
+    JSON.parse(resp.body)
+  end
+  
+  #TODo
+  # def create_gist(input = "redline6561", options = {})
+  #   options.merge!({:basic_auth => @auth})
+  #   gist = self.class.post("/gists")
+  # end
+  
+  #TODO
+  # def edit_gist
+  # end
+
+  def delete_gist(id, options ={})
+    options.merge!({:basic_auth => @auth})
+    self.class.delete("/gists/#{id}", options)
+  end
+
+  def star_gist(id, options = {})
+    options.merge!({:basic_auth => @auth})
+    self.class.put("/gists/#{id}/star", options)
+  end
+
+  def unstar_gist(id, options)
+    options.merge!({:basic_auth => @auth})
+    self.class.delete("/gists/#{id}/star", options)
+  end
 
 end
 
@@ -52,17 +83,24 @@ def put_users_into_database(input)
   end
 end
 
-array = []
+#array = []
 
 github = Github.new
-array = github.get_all_users
-put_users_into_database(array)
+github.get_user
+
+#array = github.get_all_users
+#put_users_into_database(array)
 #github.get_followers
 
-#binding.pry
+binding.pry
 #user = Cheepcreep::GitHubUser.create(JSON.parse(resp.body))
 
 #creeper = CheepcreepApp.new
 #reeper.creep
 
 
+# def update_user(:name => nil, :email => nil, :blog => nil, :location => nil )
+#   contents = {:name => name, :email => email, :blog => blog, :location => location}
+#   options = {:body => contents.to_json}
+#   result = self.class.patch('/user', options)
+# end
