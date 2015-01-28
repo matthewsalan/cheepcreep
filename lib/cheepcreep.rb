@@ -43,17 +43,19 @@ class Github
   	return user_info
   end
 
-  def get_gists(user = "redline6561")
+  def get_gists(user = "redline6561", options = {})
     options.merge!({:basic_auth => @auth})
     resp = self.class.get("/users/#{user}/gists")
     JSON.parse(resp.body)
   end
   
-  #TODo
-  # def create_gist(input = "redline6561", options = {})
-  #   options.merge!({:basic_auth => @auth})
-  #   gist = self.class.post("/gists")
-  # end
+  #pretty sure this won't work
+  def create_gist(user = "redline6561", options = {})
+    contents = {"description": "the description of the gist", "public": true, 
+                "files": {File.open "~/tiy-ror/homework/cheepcreep/sample.md" => {:content => "File contents"}}}
+    options.merge!({:basic_auth => @auth})
+    gist = self.class.post("/gists/", contents.to_json, options,)
+  end
   
   #TODO
   # def edit_gist
@@ -69,7 +71,7 @@ class Github
     self.class.put("/gists/#{id}/star", options)
   end
 
-  def unstar_gist(id, options)
+  def unstar_gist(id, options = {})
     options.merge!({:basic_auth => @auth})
     self.class.delete("/gists/#{id}/star", options)
   end
