@@ -14,7 +14,7 @@ class Github
   include HTTParty
   base_uri 'https://api.github.com'
   
-  def initialize(user = "matthewsalan", pass = "KaG39cNxiXaRfE")
+  def initialize(user = "matthewsalan", pass = "")
     @auth = {:username => user, :password => pass}
   end
 
