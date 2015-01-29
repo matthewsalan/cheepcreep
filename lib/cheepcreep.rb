@@ -14,7 +14,7 @@ class Github
   include HTTParty
   base_uri 'https://api.github.com'
   
-  def initialize(user = "apitestfun", pass = "ironyard1")
+  def initialize(user = "matthewsalan", pass = "KaG39cNxiXaRfE")
     @auth = {:username => user, :password => pass}
   end
 
@@ -43,18 +43,31 @@ class Github
   	return user_info
   end
 
-  def get_gists(user = "redline6561", options = {})
+  def get_gists(user = "matthewsalan", options = {})
     options.merge!({:basic_auth => @auth})
     resp = self.class.get("/users/#{user}/gists")
     JSON.parse(resp.body)
   end
   
-  #pretty sure this won't work
-  def create_gist(user = "redline6561", options = {})
-    contents = {"description": "the description of the gist", "public": true, 
-                "files": {File.open "~/tiy-ror/homework/cheepcreep/sample.md" => {:content => "File contents"}}}
+  def create_gist(user = "matthewsalan", options = {}, info = {:description => "the description for this gist", :public => true, :files => {"file1.txt" => {:content => "String file contents"}}})
+    options = {:body => info.to_json}
     options.merge!({:basic_auth => @auth})
-    gist = self.class.post("/gists/", contents.to_json, options,)
+    resp = self.class.post("/gists", options)
+  end
+
+  def list_gists(user = "matthewsalan", option = {})
+    option.merge!({:basic_auth => @auth})
+    resp = self.class.get("/users/#{user}/gists")
+    JSON.parse(resp.body)
+  end
+
+  def get_file_as_string(filename)
+    data =''
+    f = File.open(filename, 'r')
+    f.each_line do |line|
+      data += line
+    end
+    return data
   end
   
   #TODO
@@ -88,8 +101,7 @@ end
 #array = []
 
 github = Github.new
-github.get_user
-
+github.list_gists
 #array = github.get_all_users
 #put_users_into_database(array)
 #github.get_followers
